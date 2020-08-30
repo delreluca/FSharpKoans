@@ -60,6 +60,18 @@ module ``about the stock example`` =
 
     [<Koan>]
     let YouGotTheAnswerCorrect() =
-        let result =  __
+
+        let split (line:string) = line.Split([|','|])
+
+        let extractOhlc parts =
+            parts |> Array.skip 1 |> Array.take 4 |>
+            Array.map (fun x -> System.Double.Parse(x, System.Globalization.CultureInfo.InvariantCulture))
+
+        let objective parts =
+            match extractOhlc parts with
+                | [|op;_;_;cl|] -> abs (op-cl)
+                | _ -> failwith "extractOc did not return two elements O/C"
+
+        let result = (stockData |> List.skip 1 |> List.map split |> List.maxBy objective).[0]
         
         AssertEquality "2012-03-13" result
